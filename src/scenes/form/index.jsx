@@ -1,15 +1,22 @@
-import {Box, Button, TextField} from "@mui/material";
-import {Formik} from "formik";
+import { Box, Button, TextField } from "@mui/material";
+import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import Axios from "axios";
 
 const Form = () => {
+    
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    const handleFormSubmit = async (values) => {
+      try {
+        const response = await Axios.post("http://127.0.0.1:8000/", values);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error creating user:", error);
+      }
   
-    const handleFormSubmit = (values) => {
-      console.log(values);
-    };
+    }
   
     return (
       <Box m="20px">
@@ -92,6 +99,19 @@ const Form = () => {
                 <TextField
                   fullWidth
                   variant="filled"
+                  type="password" 
+                  label="Password" 
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password} 
+                  name="password" 
+                  error={!!touched.password && !!errors.password} 
+                  helperText={touched.password && errors.password} 
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  fullWidth
+                  variant="filled"
                   type="text"
                   label="Address 1"
                   onBlur={handleBlur}
@@ -139,14 +159,17 @@ const Form = () => {
       .string()
       .matches(phoneRegExp, "Phone number is not valid")
       .required("required"),
+    password: yup.string().required("required"), 
     address1: yup.string().required("required"),
     address2: yup.string().required("required"),
   });
-  const initialValues = {
+
+const initialValues = {
     firstName: "",
     lastName: "",
     email: "",
     contact: "",
+    password: "", 
     address1: "",
     address2: "",
   };

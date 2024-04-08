@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -16,10 +16,12 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import { signOut } from 'firebase/auth';
+import { auth } from '../../Firebaseauth';
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected ,onPress}) => {
   const theme = useTheme();
-  console.log(theme);
+  
   const colors = tokens(theme.palette.mode);
 
   return (
@@ -28,21 +30,36 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       style={{
         color: colors?.gray[100],
       }}
-      onClick={() => setSelected(title)}
+      onClick={() => {
+        setSelected(title)
+       if(onPress) onPress()
+      }}
       icon={icon}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
+    {to &&  <Link to={to} />}
     </MenuItem>
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
   const theme = useTheme();
+  const navigate =useNavigate()
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-
+  function handleSignOut() {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      console.log('Sign-out successful.')
+      handleAuthStatusChange(false)
+      // navigate('/signin')
+    }).catch((error) => {
+      // An error happened.
+      console.log(error)
+      // An error happened.
+    });
+  }
   return (
     <Box
       sx={{
@@ -120,7 +137,7 @@ const Sidebar = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/"
+              to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -133,6 +150,14 @@ const Sidebar = () => {
             >
               Data
             </Typography>
+            {isauthenticated &&<Item
+              title="Logout"
+              // to="/logout"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              onPress={()=>handleSignOut()}
+            />}
             <Item
               title="Manage Team"
               to="/team"
