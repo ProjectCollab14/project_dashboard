@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -16,9 +16,9 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../Firebaseauth';
-
 
 const Item = ({ title, to, icon, selected, setSelected ,onPress}) => {
   const theme = useTheme();
@@ -45,6 +45,7 @@ const Item = ({ title, to, icon, selected, setSelected ,onPress}) => {
 
 const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
   const theme = useTheme();
+  const navigate =useNavigate()
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
@@ -125,7 +126,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
+                 
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   VP Fancy Admin
@@ -153,7 +154,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
             {isauthenticated &&<Item
               title="Logout"
               // to="/logout"
-              icon={<PeopleOutlinedIcon />}
+              icon={<LogoutIcon />}
               selected={selected}
               setSelected={setSelected}
               onPress={()=>handleSignOut()}
