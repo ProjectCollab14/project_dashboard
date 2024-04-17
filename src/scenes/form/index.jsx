@@ -126,13 +126,13 @@ const Form = () => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  label="Address 2"
+                  label="Company name"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.address2}
+                  value={values.companyname}
                   name="address2"
-                  error={!!touched.address2 && !!errors.address2}
-                  helperText={touched.address2 && errors.address2}
+                  error={!!touched.companyname && !!errors.companyname}
+                  helperText={touched.companyname && errors.companyname}
                   sx={{ gridColumn: "span 4" }}
                 />
               </Box>

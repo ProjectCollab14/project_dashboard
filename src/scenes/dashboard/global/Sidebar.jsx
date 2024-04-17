@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link,useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -45,7 +45,7 @@ const Item = ({ title, to, icon, selected, setSelected ,onPress}) => {
 
 const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
   const theme = useTheme();
-  const navigate =useNavigate()
+  
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
@@ -81,7 +81,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar collapsed={!isCollapsed}>
         <Menu iconShape="square">
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -99,7 +99,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.gray[100]}>
-                  ADMINS
+                
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -108,16 +108,10 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
             )}
           </MenuItem>
 
-          {!isCollapsed && (
+          {isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                
               </Box>
               <Box textAlign="center">
                 <Typography
@@ -129,7 +123,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
                  
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  VP Fancy Admin
+                  
                 </Typography>
               </Box>
             </Box>
@@ -161,7 +155,7 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
             />}
             <Item
               title="Manage Team"
-              to="/team"
+              to="/team"  
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -253,3 +247,4 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
 };
 
 export default Sidebar;
+
