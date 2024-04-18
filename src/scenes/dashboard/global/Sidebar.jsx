@@ -20,6 +20,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../Firebaseauth';
 
+
 const Item = ({ title, to, icon, selected, setSelected ,onPress}) => {
   const theme = useTheme();
   
@@ -49,6 +50,9 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  if (!isauthenticated) {
+    return null; // Don't render anything if the user is not authenticated
+  }
   function handleSignOut() {
     signOut(auth).then(() => {
       // Sign-out successful.
@@ -242,9 +246,9 @@ const Sidebar = ({handleAuthStatusChange,isauthenticated}) => {
           </Box>
         </Menu>
       </ProSidebar>
+      
     </Box>
   );
 };
 
 export default Sidebar;
-
