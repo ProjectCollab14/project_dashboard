@@ -9,6 +9,7 @@ import {
   DialogActions,
   Button,
   Typography,
+  TextField, // Import TextField component
 } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../../theme";
@@ -19,28 +20,58 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { collection, getDocs } from "firebase/firestore";
-import { txtDB } from "../../Firebaseauth/index";
+import { doc, getDoc } from "firebase/firestore";
+import { ref, getDownloadURL } from "firebase/storage";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { db, storage } from "../../Firebaseauth/index";
+import { getDocs, query, collection, where } from "firebase/firestore";
 
 const ProfileDialog = ({ open, onClose, userData }) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>User Profile</DialogTitle>
-      <DialogContent>
-        <Box display="flex" alignItems="center">
-          <img src={userData.profileImage} alt="Profile" style={{ marginRight: '16px', borderRadius: '50%', width: '50px', height: '50px' }} />
-          <Typography variant="h6">{userData.username}</Typography>
-        </Box>
-        <Typography variant="body1">Contact Number: {userData.contactNumber}</Typography>
-        <Typography variant="body1">Project Name: {userData.projectName}</Typography>
-        <Typography variant="body1">Company: {userData.company}</Typography>
+      <DialogContent sx={{ padding: "20px" }}>
+        {/* Display user data in form */}
+        <form>
+          <TextField
+            label="Username"
+            value={userData.username}
+            fullWidth
+            disabled
+            sx={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Contact Number"
+            value={userData.contactNumber}
+            fullWidth
+            disabled
+            sx={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Project Name"
+            value={userData.projectName}
+            fullWidth
+            disabled
+            sx={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Company"
+            value={userData.company}
+            fullWidth
+            disabled
+            sx={{ marginBottom: "10px" }}
+          />
+        </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose} color="primary">
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
 
 const SignInForm = () => {
   // Define your form fields and handlers here
@@ -55,13 +86,52 @@ const SignInForm = () => {
   );
 };
 
-const Topbar = () => {
+const Topbar = ({ isauthenticated }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [showSignInForm, setShowSignInForm] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [user, setUser] = useState(null); // State to store the current user
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, update user state
+        setUser(user);
+      } else {
+        // User is signed out, clear user state
+        setUser(null);
+      }
+    });
+
+    // Cleanup function to unsubscribe from the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // Fetch user data when user state changes
+    if (user) {
+      fetchUserData(user.uid);
+    }
+  }, [user]);
+
+  const fetchUserData = async (userId) => {
+    console.log("Fetching user data for userId:", userId);
+
+    const querySnapshot = await getDocs(
+      query(collection(db, "users"), where("userId", "==", userId))
+    );
+
+    if (!querySnapshot.empty) {
+      const docSnap = querySnapshot.docs[0];
+      setUserData(docSnap.data());
+    } else {
+      console.log("No such user!");
+    }
+  };
 
   const toggleSignInForm = () => {
     setShowSignInForm(!showSignInForm);
@@ -71,17 +141,15 @@ const Topbar = () => {
     setShowProfileDialog(!showProfileDialog);
   };
 
-  useEffect(() => {
-    // Fetch user data from Firestore
-    const fetchUserData = async () => {
-      const userCollectionRef = collection(txtDB, 'users');
-      const querySnapshot = await getDocs(userCollectionRef);
-      const userData = querySnapshot.docs.map(doc => doc.data());
-      setUserData(userData);
-    };
+  const handleIconClick = () => {
+    if (user) {
+      toggleProfileDialog();
+    }
+  };
 
-    fetchUserData();
-  }, []);
+  if (!isauthenticated) {
+    return null; // Don't render the Topbar if the user is not authenticated
+  }
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -112,9 +180,11 @@ const Topbar = () => {
         <IconButton>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={toggleProfileDialog}>
-          <PersonOutlinedIcon />
-        </IconButton>
+        {user && (
+          <IconButton onClick={handleIconClick}>
+            <PersonOutlinedIcon />
+          </IconButton>
+        )}
         {/* Profile Dialog */}
         {userData && (
           <ProfileDialog
