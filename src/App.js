@@ -3,7 +3,7 @@ import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import Topbar from "./scenes/dashboard/global/Topbar";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Sidebar from "./scenes/dashboard/global/Sidebar";
+import Sidebar from './scenes/dashboard/global/Sidebar'
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/dashboard/Team";
 import Invoices from "./scenes/invoices";
@@ -21,6 +21,7 @@ import AuthDetails from "../src/Login/AuthDetails";
 import IsNotAuthenticated from "../src/Login/IsNotAuthenticated";
 import IsAuthenticated from "../src/scenes/isAuthenticated";
 
+
 function App() {
   const [theme, colorMode] = useMode();
   const [authenticated, setAuthenticated] = useState(false);
@@ -37,7 +38,8 @@ function App() {
         <div className="app">
           <Sidebar handleAuthStatusChange={handleAuthStatusChange} isauthenticated={authenticated}/>
           <main className="content">
-            <Topbar />
+            <Topbar handleAuthStatusChange={handleAuthStatusChange} isauthenticated={authenticated}/>
+            
             
               <Routes>
               <Route path="/" element={<IsAuthenticated authenticated={authenticated}/>}>
